@@ -1,0 +1,156 @@
+import numpy as np
+
+# number of first vertex used in displaying and reading data
+vertex_offset = 1
+
+# this class represents graph as adjacency list
+# __init__ takes array of neighbours of 'index' vertex with 
+# vertices numbers starting with 0 and array[vertex] being list of 
+# neighbours (arrays in 'array' have various length)
+class AdjacencyList:
+    vertices_nr = 0
+    neighbours_lists = []
+
+    def __init__(self, array):
+        self.vertices_nr = len(array)
+        self.neighbours_lists = array
+
+    def __str__(self):
+        result = "Lista sąsiedztwa\n"
+        for vertex in range(self.vertices_nr):
+            # vertex nr
+            result += str(vertex + vertex_offset) + ": "
+            # listed neighbours
+            result += ", ".join(str(neighbour + vertex_offset) 
+                    for neighbour in self.neighbours_lists[vertex])
+            result += "\n"
+
+        return result
+
+
+# first dimension is rows, second is columns
+def matrix_to_string(matrix, rows_desc, columns_desc, offset = 0):
+
+    max_len_row_desc = max(map(len, rows_desc))
+    max_len_col_desc = max(max(map(len, columns_desc)), 2)
+    def make_row_desc(string):
+        return string.ljust(max_len_row_desc)
+    def make_col_desc(string):
+        return string.ljust(max_len_col_desc)
+    def make_node_desc(number):
+        return make_col_desc(str(number + offset))
+    def make_separator():
+        result = make_row_desc("")
+        for col_iter in range(columns_nr):
+            result += "+"
+            result += "-" * max_len_col_desc
+
+        result += "+\n"
+        return result
+
+    rows_nr = len(matrix)
+    columns_nr = len(matrix[0])
+
+    result = make_row_desc("") + " " + " ".join(make_col_desc(column)
+            for column in columns_desc) + "\n"
+    result += make_separator()
+
+    for row_iter in range(rows_nr):
+        result += make_row_desc(rows_desc[row_iter])
+        for col_iter in range(columns_nr):
+            result += "|"
+            result += make_node_desc(matrix[row_iter][col_iter])
+
+        result += "|\n"
+        result += make_separator()
+
+
+    return result
+
+
+
+
+# matrix member of AdjacencyMatrix is 2 dim matrix with fixed number
+# of columns. Each value is either 0 or 1 and tells if two
+# vertices are adjacent or not
+# matrix[vertex1][vertex2] == matrix[vertex2][vertex1] == 1 =>
+# vertex1 and vertex2 are neighbours
+class AdjacencyMatrix:
+    vertices_nr = 0
+    matrix = []
+
+    def __init__(self, array):
+        self.vertices_nr = len(array)
+        self.matrix = array
+
+    def __str__(self):
+        global vertex_offset
+
+        columns_and_rows_description = list(map(str, \
+                range(vertex_offset, self.vertices_nr + vertex_offset)))
+
+        result = "Macierz sąsiedztwa\n"
+        result += matrix_to_string(self.matrix, \
+                columns_and_rows_description, \
+                columns_and_rows_description)
+
+        return result
+
+
+# rows of matrix are vertices, and columns are edges
+# if matrix[vertex][edge] == 1 => vertex and edge are incident
+class IncidenceMatrix:
+    vertices_nr = 0
+    matrix = []
+    edges_nr = 0
+
+    def __init__(self, array):
+        self.vertices_nr = len(array)
+        self.matrix = array
+        self.edges_nr = len(array[0])
+
+    def __str__(self):
+        global vertex_offset
+
+        rows_description = []
+        for row_nr in range(self.vertices_nr):
+            rows_description.append(str(row_nr + vertex_offset))
+
+        edges_description = []
+        for edge_nr in range(self.edges_nr):
+            edges_description.append("L" + str(edge_nr + vertex_offset))
+
+        result = "Macierz incydencji\n"
+        result += matrix_to_string(self.matrix, \
+                rows_description, edges_description)
+        return result
+
+
+
+neighbour_list = AdjacencyList([
+    [1, 4], 
+    [0, 2, 3, 4], 
+    [1, 3], 
+    [1, 2, 4], 
+    [0, 1, 3]
+    ])
+print(neighbour_list)
+
+neighbour_matrix = AdjacencyMatrix([
+        [0, 1, 0, 0, 1], 
+        [1, 0, 1, 1, 1],
+        [0, 1, 0, 1, 0],
+        [0, 1, 1, 0, 1],
+        [1, 1, 0, 1, 0]
+        ])
+print(neighbour_matrix)
+
+incidence_matrix = IncidenceMatrix([
+        [1, 0, 0, 0, 1, 0, 0],
+        [1, 1, 0, 0, 0, 1, 1],
+        [0, 1, 1, 0, 0, 0, 0],
+        [0, 0, 1, 1, 0, 0, 1],
+        [0, 0, 0, 1, 1, 1, 0]
+        ])
+print(incidence_matrix)
+
