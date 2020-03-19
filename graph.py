@@ -8,8 +8,6 @@ vertex_offset = 1
 # vertices numbers starting with 0 and array[vertex] being list of 
 # neighbours (arrays in 'array' have various length)
 class adjacency_list:
-    vertices_nr = 0
-    neighbours_lists = []
 
     def __init__(self, array):
         self.vertices_nr = len(array)
@@ -28,7 +26,7 @@ class adjacency_list:
         return result
 
 
-# first dimension is rows, second is columns
+# first dimension is row, second is column
 def matrix_to_string(matrix, rows_desc, columns_desc, offset = 0):
 
     max_len_row_desc = max(map(len, rows_desc))
@@ -76,8 +74,6 @@ def matrix_to_string(matrix, rows_desc, columns_desc, offset = 0):
 # matrix[vertex1][vertex2] == matrix[vertex2][vertex1] == 1 =>
 # vertex1 and vertex2 are neighbours
 class adjacency_matrix:
-    vertices_nr = 0
-    matrix = []
 
     def __init__(self, array):
         self.vertices_nr = len(array)
@@ -100,9 +96,6 @@ class adjacency_matrix:
 # rows of matrix are vertices, and columns are edges
 # if matrix[vertex][edge] == 1 => vertex and edge are incident
 class incidence_matrix:
-    vertices_nr = 0
-    matrix = []
-    edges_nr = 0
 
     def __init__(self, array):
         self.vertices_nr = len(array)

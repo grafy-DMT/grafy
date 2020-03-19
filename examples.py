@@ -1,5 +1,6 @@
 import graph as gp
 
+# all these examples are equivalent to graph from classes
 neighbour_list = gp.adjacency_list([
     [1, 4], 
     [0, 2, 3, 4], 
