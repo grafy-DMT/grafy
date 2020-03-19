@@ -7,7 +7,7 @@ vertex_offset = 1
 # __init__ takes array of neighbours of 'index' vertex with 
 # vertices numbers starting with 0 and array[vertex] being list of 
 # neighbours (arrays in 'array' have various length)
-class adjacency_list:
+class AdjacencyList:
 
     def __init__(self, array):
         self.vertices_nr = len(array)
@@ -68,12 +68,12 @@ def matrix_to_string(matrix, rows_desc, columns_desc, offset = 0):
 
 
 
-# matrix member of adjacency_matrix is 2 dim matrix with fixed number
+# matrix member of AdjacencyMatrix is 2 dim matrix with fixed number
 # of columns. Each value is either 0 or 1 and tells if two
 # vertices are adjacent or not
 # matrix[vertex1][vertex2] == matrix[vertex2][vertex1] == 1 =>
 # vertex1 and vertex2 are neighbours
-class adjacency_matrix:
+class AdjacencyMatrix:
 
     def __init__(self, array):
         self.vertices_nr = len(array)
@@ -95,7 +95,7 @@ class adjacency_matrix:
 
 # rows of matrix are vertices, and columns are edges
 # if matrix[vertex][edge] == 1 => vertex and edge are incident
-class incidence_matrix:
+class IncidenceMatrix:
 
     def __init__(self, array):
         self.vertices_nr = len(array)

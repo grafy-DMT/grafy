@@ -1,7 +1,7 @@
 import graph as gp
 
 # all these examples are equivalent to graph from classes
-neighbour_list = gp.adjacency_list([
+neighbour_list = gp.AdjacencyList([
     [1, 4], 
     [0, 2, 3, 4], 
     [1, 3], 
@@ -10,7 +10,7 @@ neighbour_list = gp.adjacency_list([
     ])
 print(neighbour_list)
 
-neighbour_matrix = gp.adjacency_matrix([
+neighbour_matrix = gp.AdjacencyMatrix([
         [0, 1, 0, 0, 1], 
         [1, 0, 1, 1, 1],
         [0, 1, 0, 1, 0],
@@ -19,7 +19,7 @@ neighbour_matrix = gp.adjacency_matrix([
         ])
 print(neighbour_matrix)
 
-incidence_matrix = gp.incidence_matrix([
+incidence_matrix = gp.IncidenceMatrix([
         [1, 0, 0, 0, 1, 0, 0],
         [1, 1, 0, 0, 0, 1, 1],
         [0, 1, 1, 0, 0, 0, 0],
