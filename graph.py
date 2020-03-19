@@ -7,7 +7,7 @@ vertex_offset = 1
 # __init__ takes array of neighbours of 'index' vertex with 
 # vertices numbers starting with 0 and array[vertex] being list of 
 # neighbours (arrays in 'array' have various length)
-class AdjacencyList:
+class adjacency_list:
     vertices_nr = 0
     neighbours_lists = []
 
@@ -70,12 +70,12 @@ def matrix_to_string(matrix, rows_desc, columns_desc, offset = 0):
 
 
 
-# matrix member of AdjacencyMatrix is 2 dim matrix with fixed number
+# matrix member of adjacency_matrix is 2 dim matrix with fixed number
 # of columns. Each value is either 0 or 1 and tells if two
 # vertices are adjacent or not
 # matrix[vertex1][vertex2] == matrix[vertex2][vertex1] == 1 =>
 # vertex1 and vertex2 are neighbours
-class AdjacencyMatrix:
+class adjacency_matrix:
     vertices_nr = 0
     matrix = []
 
@@ -99,7 +99,7 @@ class AdjacencyMatrix:
 
 # rows of matrix are vertices, and columns are edges
 # if matrix[vertex][edge] == 1 => vertex and edge are incident
-class IncidenceMatrix:
+class incidence_matrix:
     vertices_nr = 0
     matrix = []
     edges_nr = 0
@@ -125,32 +125,4 @@ class IncidenceMatrix:
                 rows_description, edges_description)
         return result
 
-
-
-neighbour_list = AdjacencyList([
-    [1, 4], 
-    [0, 2, 3, 4], 
-    [1, 3], 
-    [1, 2, 4], 
-    [0, 1, 3]
-    ])
-print(neighbour_list)
-
-neighbour_matrix = AdjacencyMatrix([
-        [0, 1, 0, 0, 1], 
-        [1, 0, 1, 1, 1],
-        [0, 1, 0, 1, 0],
-        [0, 1, 1, 0, 1],
-        [1, 1, 0, 1, 0]
-        ])
-print(neighbour_matrix)
-
-incidence_matrix = IncidenceMatrix([
-        [1, 0, 0, 0, 1, 0, 0],
-        [1, 1, 0, 0, 0, 1, 1],
-        [0, 1, 1, 0, 0, 0, 0],
-        [0, 0, 1, 1, 0, 0, 1],
-        [0, 0, 0, 1, 1, 1, 0]
-        ])
-print(incidence_matrix)
 
