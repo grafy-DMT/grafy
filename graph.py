@@ -11,12 +11,12 @@ vertex_offset = 1
 class AdjacencyList:
 
     def __init__(self, array):
-        self.vertices_count = len(array)
+        self.vertex_count = len(array)
         self.neighbours_lists = array
 
     def __str__(self):
         result = "Lista sąsiedztwa\n"
-        for vertex in range(self.vertices_count):
+        for vertex in range(self.vertex_count):
             # vertex nr
             result += str(vertex + vertex_offset) + ": "
             # listed neighbours
@@ -77,14 +77,14 @@ def matrix_to_string(matrix, rows_desc, columns_desc, offset = 0):
 class AdjacencyMatrix:
 
     def __init__(self, array):
-        self.vertices_count = len(array)
+        self.vertex_count = len(array)
         self.matrix = array
 
     def __str__(self):
         global vertex_offset
 
         columns_and_rows_description = list(map(str, \
-                range(vertex_offset, self.vertices_count + vertex_offset)))
+                range(vertex_offset, self.vertex_count + vertex_offset)))
 
         result = "Macierz sąsiedztwa\n"
         result += matrix_to_string(self.matrix, \
@@ -94,21 +94,21 @@ class AdjacencyMatrix:
         return result
 
 def adjacency_list_to_adjacency_matrix(adjacency_list):
-    vertices_count = adjacency_list.vertices_count
-    result_matrix = np.zeros((vertices_count, vertices_count), dtype = int)
-    for vertex in range(vertices_count):
+    vertex_count = adjacency_list.vertex_count
+    result_matrix = np.zeros((vertex_count, vertex_count), dtype = int)
+    for vertex in range(vertex_count):
         for neighbour in adjacency_list.neighbours_lists[vertex]:
             result_matrix[vertex][neighbour] = 1
 
     return AdjacencyMatrix(result_matrix)
 
 def adjacency_matrix_to_adjacency_list(adjacency_matrix):
-    vertices_count = adjacency_matrix.vertices_count
+    vertex_count = adjacency_matrix.vertex_count
     matrix = adjacency_matrix.matrix
     result_list = []
-    for vertex_index in range(vertices_count):
+    for vertex_index in range(vertex_count):
         vertex_neighbours = []
-        for neighbour_nr in range(vertices_count):
+        for neighbour_nr in range(vertex_count):
             if bool(matrix[vertex_index][neighbour_nr]):
                 vertex_neighbours.append(neighbour_nr)
         result_list.append(vertex_neighbours)
@@ -121,19 +121,19 @@ def adjacency_matrix_to_adjacency_list(adjacency_matrix):
 class IncidenceMatrix:
 
     def __init__(self, array):
-        self.vertices_count = len(array)
+        self.vertex_count = len(array)
         self.matrix = array
-        self.edges_count = len(array[0])
+        self.edge_count = len(array[0])
 
     def __str__(self):
         global vertex_offset
 
         rows_description = []
-        for row_nr in range(self.vertices_count):
+        for row_nr in range(self.vertex_count):
             rows_description.append(str(row_nr + vertex_offset))
 
         edges_description = []
-        for edge_nr in range(self.edges_count):
+        for edge_nr in range(self.edge_count):
             edges_description.append("L" + str(edge_nr + vertex_offset))
 
         result = "Macierz incydencji\n"
@@ -141,19 +141,23 @@ class IncidenceMatrix:
                 rows_description, edges_description)
         return result
 
-def adjacency_matrix_to_incidence_matrix(adjacency_matrix):
-    vertices_count = adjacency_matrix.vertices_count
-    edges_count = 0
-    for vertex_index in range(vertices_count):
-        for other_vertex_index in range(vertex_index, vertices_count):
-            if bool(adjacency_matrix.matrix[vertex_index][other_vertex_index]):
-                edges_count += 1
 
-    result_matrix = np.zeros((vertices_count, edges_count), dtype = int)
+
+# Conversions
+
+def adjacency_matrix_to_incidence_matrix(adjacency_matrix):
+    vertex_count = adjacency_matrix.vertex_count
+    edge_count = 0
+    for vertex_index in range(vertex_count):
+        for other_vertex_index in range(vertex_index, vertex_count):
+            if bool(adjacency_matrix.matrix[vertex_index][other_vertex_index]):
+                edge_count += 1
+
+    result_matrix = np.zeros((vertex_count, edge_count), dtype = int)
 
     edge_index = 0
-    for vertex_index in range(vertices_count):
-        for other_vertex_index in range(vertex_index, vertices_count):
+    for vertex_index in range(vertex_count):
+        for other_vertex_index in range(vertex_index, vertex_count):
             if bool(adjacency_matrix.matrix[vertex_index][other_vertex_index]):
                 result_matrix[vertex_index][edge_index] = 1
                 result_matrix[other_vertex_index][edge_index] = 1
@@ -162,14 +166,14 @@ def adjacency_matrix_to_incidence_matrix(adjacency_matrix):
     return IncidenceMatrix(result_matrix)
 
 def incidence_matrix_to_adjacency_matrix(incidence_matrix):
-    vertices_count = incidence_matrix.vertices_count
-    edges_count = incidence_matrix.edges_count
+    vertex_count = incidence_matrix.vertex_count
+    edge_count = incidence_matrix.edge_count
 
-    result_matrix = np.zeros((vertices_count, vertices_count), dtype = int)
+    result_matrix = np.zeros((vertex_count, vertex_count), dtype = int)
 
-    for edge_index in range(edges_count):
+    for edge_index in range(edge_count):
         vertices = []
-        for vertex_index in range(vertices_count):
+        for vertex_index in range(vertex_count):
             if bool(incidence_matrix.matrix[vertex_index][edge_index]):
                 vertices.append(vertex_index)
 
@@ -186,35 +190,61 @@ def incidence_matrix_to_adjacency_list(incidency_matrix):
     adjacency_matrix = incidence_matrix_to_adjacency_matrix(incidency_matrix)
     return adjacency_matrix_to_adjacency_list(adjacency_matrix)
 
+def convert(graph, output_type):
+    input_type = type(graph)
+    if input_type is output_type:
+        return graph
+    if input_type is AdjacencyList:
+        if output_type is AdjacencyMatrix:
+            return adjacency_list_to_adjacency_matrix(graph)
+        if output_type is IncidenceMatrix:
+            return adjacency_list_to_incidence_matrix(graph)
+    if input_type is AdjacencyMatrix:
+        if output_type is AdjacencyList:
+            return adjacency_matrix_to_adjacency_list(graph)
+        if output_type is IncidenceMatrix:
+            return adjacency_matrix_to_incidence_matrix(graph)
+    if input_type is IncidenceMatrix:
+        if output_type is AdjacencyList:
+            return incidence_matrix_to_adjacency_list(graph)
+        if output_type is AdjacencyMatrix:
+            return incidence_matrix_to_adjacency_matrix(graph)
+    raise ValueError("Wrong arguments: graph - " + repr(graph) + ", output_type - " + repr(output_type))
+
+
+
 # class type should be an argument
-def random_graph_edges_count(vertices_count, edges_count):
+def random_graph_edge_count(vertex_count, edge_count, graph_type = IncidenceMatrix):
     all_pairs = []
-    for idx1 in range(vertices_count):
+    for idx1 in range(vertex_count):
         for idx2 in range(idx1):
             all_pairs.append((idx1, idx2))
 
-    random_pairs = random.sample(all_pairs, edges_count)
+    random_pairs = random.sample(all_pairs, edge_count)
     # IncidenceMatrix
-    matrix = np.zeros((vertices_count, edges_count), dtype = int)
-    for edge_nr in range(edges_count):
+    matrix = np.zeros((vertex_count, edge_count), dtype = int)
+    for edge_nr in range(edge_count):
         matrix[random_pairs[edge_nr][0]][edge_nr] = 1
         matrix[random_pairs[edge_nr][1]][edge_nr] = 1
 
-    return IncidenceMatrix(matrix)
+    result = IncidenceMatrix(matrix)
+    return convert(result, graph_type)
 
 # class type should be an argument
-def random_graph_edge_probability(vertices_count, edge_probability):
+def random_graph_edge_probability(vertex_count, edge_probability, graph_type = AdjacencyMatrix):
     all_pairs = []
-    for idx1 in range(vertices_count):
+    for idx1 in range(vertex_count):
         for idx2 in range(idx1):
             all_pairs.append((idx1, idx2))
 
-    matrix = np.zeros((vertices_count, vertices_count), dtype = int)
+    matrix = np.zeros((vertex_count, vertex_count), dtype = int)
     for pair in all_pairs:
         if random.random() < edge_probability:
             matrix[pair[0]][pair[1]] = 1
             matrix[pair[1]][pair[0]] = 1
 
-    return AdjacencyMatrix(matrix)
+    result = AdjacencyMatrix(matrix)
+    return convert(result, graph_type)
+
 
 
