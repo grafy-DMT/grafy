@@ -1,4 +1,5 @@
 import numpy as np
+import random
 
 # number of first vertex used in displaying and reading data
 vertex_offset = 1
@@ -184,4 +185,36 @@ def adjacency_list_to_incidence_matrix(adjacency_list):
 def incidence_matrix_to_adjacency_list(incidency_matrix):
     adjacency_matrix = incidence_matrix_to_adjacency_matrix(incidency_matrix)
     return adjacency_matrix_to_adjacency_list(adjacency_matrix)
+
+# class type should be an argument
+def random_graph_edges_count(vertices_count, edges_count):
+    all_pairs = []
+    for idx1 in range(vertices_count):
+        for idx2 in range(idx1):
+            all_pairs.append((idx1, idx2))
+
+    random_pairs = random.sample(all_pairs, edges_count)
+    # IncidenceMatrix
+    matrix = np.zeros((vertices_count, edges_count), dtype = int)
+    for edge_nr in range(edges_count):
+        matrix[random_pairs[edge_nr][0]][edge_nr] = 1
+        matrix[random_pairs[edge_nr][1]][edge_nr] = 1
+
+    return IncidenceMatrix(matrix)
+
+# class type should be an argument
+def random_graph_edge_probability(vertices_count, edge_probability):
+    all_pairs = []
+    for idx1 in range(vertices_count):
+        for idx2 in range(idx1):
+            all_pairs.append((idx1, idx2))
+
+    matrix = np.zeros((vertices_count, vertices_count), dtype = int)
+    for pair in all_pairs:
+        if random.random() < edge_probability:
+            matrix[pair[0]][pair[1]] = 1
+            matrix[pair[1]][pair[0]] = 1
+
+    return AdjacencyMatrix(matrix)
+
 
