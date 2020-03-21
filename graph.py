@@ -4,6 +4,11 @@ import random
 # number of first vertex used in displaying and reading data
 vertex_offset = 1
 
+#########################
+# GRAPH REPRESENTATIONS
+#########################
+
+
 # this class represents graph as adjacency list
 # __init__ takes array of neighbours of 'index' vertex with 
 # vertices numbers starting with 0 and array[vertex] being list of 
@@ -142,8 +147,9 @@ class IncidenceMatrix:
         return result
 
 
-
-# Conversions
+###############
+# CONVERSIONS
+###############
 
 def adjacency_matrix_to_incidence_matrix(adjacency_matrix):
     vertex_count = adjacency_matrix.vertex_count
@@ -212,8 +218,10 @@ def convert(graph, output_type):
     raise ValueError("Wrong arguments: graph - " + repr(graph) + ", output_type - " + repr(output_type))
 
 
+#################
+# RANDOM GRAPHS
+#################
 
-# class type should be an argument
 def random_graph_edge_count(vertex_count, edge_count, graph_type = IncidenceMatrix):
     all_pairs = []
     for idx1 in range(vertex_count):
@@ -230,7 +238,6 @@ def random_graph_edge_count(vertex_count, edge_count, graph_type = IncidenceMatr
     result = IncidenceMatrix(matrix)
     return convert(result, graph_type)
 
-# class type should be an argument
 def random_graph_edge_probability(vertex_count, edge_probability, graph_type = AdjacencyMatrix):
     all_pairs = []
     for idx1 in range(vertex_count):
