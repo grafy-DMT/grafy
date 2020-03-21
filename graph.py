@@ -140,4 +140,24 @@ class IncidenceMatrix:
                 rows_description, edges_description)
         return result
 
+def adjacency_matrix_to_incidence_matrix(adjacency_matrix):
+    vertices_nr = adjacency_matrix.vertices_nr
+    edges_nr = 0
+    for vertex_nr in range(vertices_nr):
+        for other_vertex_nr in range(vertex_nr, vertices_nr):
+            if bool(adjacency_matrix.matrix[vertex_nr][other_vertex_nr]):
+                edges_nr += 1
+
+    result_matrix = np.zeros((vertices_nr, edges_nr), dtype = int)
+
+    edge_index = 0
+    for vertex_nr in range(vertices_nr):
+        for other_vertex_nr in range(vertex_nr, vertices_nr):
+            if bool(adjacency_matrix.matrix[vertex_nr][other_vertex_nr]):
+                result_matrix[vertex_nr][edge_index] = 1
+                result_matrix[other_vertex_nr][edge_index] = 1
+                edge_index += 1
+
+    return IncidenceMatrix(result_matrix)
+
 
