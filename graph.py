@@ -246,5 +246,9 @@ def random_graph_edge_probability(vertex_count, edge_probability, graph_type = A
     result = AdjacencyMatrix(matrix)
     return convert(result, graph_type)
 
+def random_graph(vertex_count, edge_count = 0, edge_probability = 0, graph_type = AdjacencyMatrix):
+    if edge_probability == 0:
+        return random_graph_edge_count(vertex_count, edge_count, graph_type)
+    return random_graph_edge_probability(vertex_count, edge_probability, graph_type)
 
 
