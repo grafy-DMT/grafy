@@ -92,6 +92,28 @@ class AdjacencyMatrix:
 
         return result
 
+def adjacency_list_to_adjacency_matrix(adjacency_list):
+    vertices_nr = adjacency_list.vertices_nr
+    result_matrix = np.zeros((vertices_nr, vertices_nr), dtype = int)
+    for vertex in range(vertices_nr):
+        for neighbour in adjacency_list.neighbours_lists[vertex]:
+            result_matrix[vertex][neighbour] = 1
+
+    return AdjacencyMatrix(result_matrix)
+
+def adjacency_matrix_to_adjacency_list(adjacency_matrix):
+    vertices_nr = adjacency_matrix.vertices_nr
+    matrix = adjacency_matrix.matrix
+    result_list = []
+    for vertex_nr in range(vertices_nr):
+        vertex_neighbours = []
+        for neighbour_nr in range(vertices_nr):
+            if bool(matrix[vertex_nr][neighbour_nr]):
+                vertex_neighbours.append(neighbour_nr)
+        result_list.append(vertex_neighbours)
+
+    return AdjacencyList(result_list)
+
 
 # rows of matrix are vertices, and columns are edges
 # if matrix[vertex][edge] == 1 => vertex and edge are incident
