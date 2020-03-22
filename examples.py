@@ -1,8 +1,8 @@
-import graph as gp
+from graph import *
 
 
 # all these examples are equivalent to graph from classes
-neighbour_list = gp.AdjacencyList([
+neighbour_list = AdjacencyList([
     [1, 4],
     [0, 2, 3, 4],
     [1, 3],
@@ -11,7 +11,7 @@ neighbour_list = gp.AdjacencyList([
     ])
 print(neighbour_list)
 
-neighbour_matrix = gp.AdjacencyMatrix([
+neighbour_matrix = AdjacencyMatrix([
         [0, 1, 0, 0, 1],
         [1, 0, 1, 1, 1],
         [0, 1, 0, 1, 0],
@@ -20,7 +20,7 @@ neighbour_matrix = gp.AdjacencyMatrix([
         ])
 print(neighbour_matrix)
 
-incidence_matrix = gp.IncidenceMatrix([
+incidence_matrix = IncidenceMatrix([
         [1, 0, 0, 0, 1, 0, 0],
         [1, 1, 0, 0, 0, 1, 1],
         [0, 1, 1, 0, 0, 0, 0],
@@ -29,21 +29,16 @@ incidence_matrix = gp.IncidenceMatrix([
         ])
 print(incidence_matrix)
 
-second_incidence_matrix = gp.convert(neighbour_list, gp.IncidenceMatrix)
+second_incidence_matrix = convert(neighbour_list, IncidenceMatrix)
 print(second_incidence_matrix)
 
 
+# random_graph takes 3 argument: vertex_count, 
+# edge_count/edge_probability, graph_type (with default AdjacencyMatrix)
+first_random_graph = random_graph(
+        10, edge_count = 7, graph_type = AdjacencyList)
 
-# random graphs
+second_random_graph = random_graph(
+        15, edge_probability = 0.4)
 
-random_graph = gp.random_graph_edge_probability(5, 0.5)
-print(random_graph)
-
-# both functions take optional type
-random_adjacency_list = gp.random_graph_edge_count(
-        10, 10, gp.AdjacencyList)
-
-# random_graph is used to invoke 2 previous functions
-third_random_graph = gp.random_graph(
-        10, edge_count = 7, graph_type = gp.AdjacencyList)
-
+print(second_random_graph)

@@ -1,6 +1,7 @@
 import numpy as np
 import random
 
+__all__ = ["AdjacencyList", "AdjacencyMatrix", "IncidenceMatrix", "convert", "random_graph"]
 # number of first vertex used in displaying and reading data
 vertex_offset = 1
 
@@ -98,6 +99,7 @@ class AdjacencyMatrix:
 
         return result
 
+
 def adjacency_list_to_adjacency_matrix(adjacency_list):
     vertex_count = adjacency_list.vertex_count
     result_matrix = np.zeros((vertex_count, vertex_count), dtype = int)
@@ -119,7 +121,6 @@ def adjacency_matrix_to_adjacency_list(adjacency_matrix):
         result_list.append(vertex_neighbours)
 
     return AdjacencyList(result_list)
-
 
 # rows of matrix are vertices, and columns are edges
 # if matrix[vertex][edge] == 1 => vertex and edge are incident
@@ -215,14 +216,22 @@ def convert(graph, output_type):
             return incidence_matrix_to_adjacency_list(graph)
         if output_type is AdjacencyMatrix:
             return incidence_matrix_to_adjacency_matrix(graph)
-    raise ValueError("Wrong arguments: graph - " + repr(graph) + ", output_type - " + repr(output_type))
+    raise ValueError(
+            "Wrong arguments: graph - " 
+            + repr(graph) 
+            + ", output_type - " 
+            + repr(output_type))
 
 
 #################
 # RANDOM GRAPHS
 #################
 
-def random_graph_edge_count(vertex_count, edge_count, graph_type = IncidenceMatrix):
+def random_graph_edge_count(
+        vertex_count,
+        edge_count,
+        graph_type=IncidenceMatrix):
+
     all_pairs = []
     for idx1 in range(vertex_count):
         for idx2 in range(idx1):
@@ -238,7 +247,11 @@ def random_graph_edge_count(vertex_count, edge_count, graph_type = IncidenceMatr
     result = IncidenceMatrix(matrix)
     return convert(result, graph_type)
 
-def random_graph_edge_probability(vertex_count, edge_probability, graph_type = AdjacencyMatrix):
+def random_graph_edge_probability(
+        vertex_count,
+        edge_probability,
+        graph_type = AdjacencyMatrix):
+
     all_pairs = []
     for idx1 in range(vertex_count):
         for idx2 in range(idx1):
@@ -253,11 +266,24 @@ def random_graph_edge_probability(vertex_count, edge_probability, graph_type = A
     result = AdjacencyMatrix(matrix)
     return convert(result, graph_type)
 
-def random_graph(vertex_count, edge_count = 0, edge_probability = 0, graph_type = AdjacencyMatrix):
+def random_graph(
+        vertex_count,
+        edge_count = 0, 
+        edge_probability = 0,
+        graph_type = AdjacencyMatrix):
+
     if edge_count == 0 and edge_probability == 0:
         raise ValueError("Need to specify edge_count or edge_pobability")
+
     if edge_probability == 0:
-        return random_graph_edge_count(vertex_count, edge_count, graph_type)
-    return random_graph_edge_probability(vertex_count, edge_probability, graph_type)
+        return random_graph_edge_count(
+                vertex_count,
+                edge_count,
+                graph_type)
+    else:
+        return random_graph_edge_probability(
+                vertex_count,
+                edge_probability,
+                graph_type)
 
 
