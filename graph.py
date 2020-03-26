@@ -295,23 +295,14 @@ def random_graph(
             graph_type)
 
 
-#################
-# READ GRAPH FROM FILE
-#################
-
 def read_graph_from_file(filename):
     with open(filename, 'r') as f:
         matrix = np.array([line.strip().split() for line in f], int)
-    adjacency_matrix = AdjacencyMatrix(matrix)
-    adjacency_list = convert(adjacency_matrix, AdjacencyList)
-    incidence_matrix = convert(adjacency_matrix, IncidenceMatrix)
-    print(adjacency_list)
-    print(incidence_matrix)
-    draw_graph(adjacency_list)
+    return AdjacencyMatrix(matrix)
 
 
 def draw_graph(adjacency_list):
-    # extract nodes from adjacency_list
+    # Extract pairs of nodes from adjacency_list
     graph = []
     for node, edges in enumerate(adjacency_list.neighbours_lists, 1):
         for edge in edges:
@@ -319,22 +310,39 @@ def draw_graph(adjacency_list):
 
     nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
 
-    # create networkx graph
+    # Create NetworkX graph
     G = nx.Graph()
-    # add nodes
+    # Add nodes to graph
     for node in nodes:
         G.add_node(node)
 
-    # add edges
+    # Add edges to graph
     for edge in graph:
         G.add_edge(edge[0], edge[1])
 
-    # draw graph
+    # Draw graph on circular layout
     pos = nx.circular_layout(G)
     nx.draw(G, pos)
     nx.draw_networkx_labels(G, pos=pos)
-    # show graph
+    # Show graph
     plt.show()
 
 
-read_graph_from_file('graph_examples.txt')
+def main():
+    print("PROJEKCIK 1 GRAFY")
+    adjacency_matrix = read_graph_from_file('graph_examples.txt')
+    adjacency_list = convert(adjacency_matrix, AdjacencyList)
+    incidence_matrix = convert(adjacency_matrix, IncidenceMatrix)
+
+    print(adjacency_list)
+    print(incidence_matrix)
+    draw_graph(adjacency_list)
+
+    rnd_graph = random_graph(7, 10)
+    draw_graph(convert(rnd_graph, AdjacencyList))
+    rnd1_graph = random_graph(7, edge_probability=0.5)
+    draw_graph(convert(rnd1_graph, AdjacencyList))
+
+
+if __name__ == "__main__":
+    main()
