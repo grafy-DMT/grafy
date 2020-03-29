@@ -295,13 +295,14 @@ def random_graph(
             graph_type)
 
 
-def read_graph_from_file(filename):
+def read_graph_from_file(filename, graph_type=AdjacencyMatrix):
     with open(filename, 'r') as f:
         matrix = np.array([line.strip().split() for line in f], int)
-    return AdjacencyMatrix(matrix)
+    return convert(AdjacencyMatrix(matrix), graph_type)
 
 
-def draw_graph(adjacency_list):
+def draw_graph(input_graph):
+    adjacency_list = convert(input_graph, AdjacencyList)
     # Extract pairs of nodes from adjacency_list
     graph = []
     for node, edges in enumerate(adjacency_list.neighbours_lists, 1):
