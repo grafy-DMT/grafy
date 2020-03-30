@@ -7,6 +7,7 @@ __all__ = ["AdjacencyList", "AdjacencyMatrix", "IncidenceMatrix", "convert", "ra
 # number of first vertex used in displaying and reading data
 vertex_offset = 1
 
+graph_in_file="AdjacencyMatrix"
 
 #########################
 # GRAPH REPRESENTATIONS
@@ -298,9 +299,14 @@ def random_graph(
 def read_graph_from_file(filename, graph_type=AdjacencyMatrix):
     with open(filename, 'r') as f:
         matrix = np.array([line.strip().split() for line in f], int)
-    return convert(AdjacencyMatrix(matrix), graph_type)
-
-
+    global graph_in_file
+    if matrix.shape[0]==matrix.shape[1] and np.allclose(matrix, matrix.T):
+        graph_in_file="AdjacencyMatrix"
+        return convert(AdjacencyMatrix(matrix), graph_type)
+    else:
+        graph_in_file="IncidenceMatrix"
+        return convert(IncidenceMatrix(matrix), graph_type)
+    
 def draw_graph(input_graph):
     adjacency_list = convert(input_graph, AdjacencyList)
     # Extract pairs of nodes from adjacency_list
@@ -335,8 +341,12 @@ def main():
     adjacency_list = convert(adjacency_matrix, AdjacencyList)
     incidence_matrix = convert(adjacency_matrix, IncidenceMatrix)
 
-    print(adjacency_list)
-    print(incidence_matrix)
+    if graph_in_file=="AdjacencyMatrix":
+        print(adjacency_list)
+        print(incidence_matrix)
+    elif graph_in_file=="IncidenceMatrix":
+        print(adjacency_matrix)
+        print(adjacency_list)
     draw_graph(adjacency_list)
 
     rnd_graph = random_graph(7, 10)
