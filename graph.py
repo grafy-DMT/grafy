@@ -300,11 +300,21 @@ def read_graph_from_file(filename, graph_type=AdjacencyMatrix):
     with open(filename, 'r') as f:
         matrix = np.array([line.strip().split() for line in f], int)
     global graph_in_file
-    if matrix.shape[0]==matrix.shape[1] and np.allclose(matrix, matrix.T):
-        graph_in_file="AdjacencyMatrix"
-        return convert(AdjacencyMatrix(matrix), graph_type)
+     if matrix.shape[0] == matrix.shape[1]:
+        diagonal = matrix.shape[0]
+        for i in range(matrix.shape[0]):
+            if matrix[i][i] == 0:
+                diagonal -= 1
+        if diagonal == 0 and np.allclose(matrix, matrix.T):
+            graph_in_file = "AdjacencyMatrix"
+        else:
+            graph_in_file = "IncidenceMatrix"
     else:
-        graph_in_file="IncidenceMatrix"
+        graph_in_file = "IncidenceMatrix"
+
+    if graph_in_file == "AdjacencyMatrix":
+        return convert(AdjacencyMatrix(matrix), graph_type)
+    elif graph_in_file == "IncidenceMatrix":
         return convert(IncidenceMatrix(matrix), graph_type)
     
 def draw_graph(input_graph):
