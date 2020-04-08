@@ -371,6 +371,9 @@ def main():
     elif graph_in_file=="IncidenceMatrix":
         print(adjacency_matrix)
         print(adjacency_list)
+    elif graph_in_file == "AdjacencyList":
+        print(adjacency_matrix)
+        print(incidence_matrix)
     draw_graph(adjacency_list)
 
     rnd_graph = random_graph(7, 10)
