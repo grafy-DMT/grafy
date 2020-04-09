@@ -30,7 +30,7 @@ class AdjacencyList:
             # vertex nr
             result += str(vertex + vertex_offset) + ": "
             # listed neighbours
-            result += ", ".join(str(neighbour + vertex_offset)
+            result += ", ".join(str(neighbour)
                                 for neighbour in self.neighbours_lists[vertex])
             result += "\n"
 
@@ -122,7 +122,7 @@ def adjacency_matrix_to_adjacency_list(adjacency_matrix):
         vertex_neighbours = []
         for neighbour_nr in range(vertex_count):
             if bool(matrix[vertex_index][neighbour_nr]):
-                vertex_neighbours.append(neighbour_nr)
+                vertex_neighbours.append(neighbour_nr+1)
         result_list.append(vertex_neighbours)
 
     return AdjacencyList(result_list)
@@ -337,7 +337,7 @@ def draw_graph(input_graph):
     graph = []
     for node, edges in enumerate(adjacency_list.neighbours_lists, 1):
         for edge in edges:
-            graph.append((node, edge + 1))
+            graph.append((node, edge))
 
     nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
 
