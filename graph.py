@@ -295,7 +295,7 @@ def random_graph(
             graph_type)
 
 
-def read_graph_from_file(filename, graph_type=AdjacencyMatrix):
+def read_graph_from_file(filename):
     graph_in_file = AdjacencyMatrix
     with open(filename, 'r') as f:
         try:
@@ -374,12 +374,12 @@ def main():
     elif type(graph_in_file) == AdjacencyList:
         print(convert(graph_in_file, AdjacencyMatrix))
         print(convert(graph_in_file, IncidenceMatrix))
-    draw_graph(convert(graph_in_file, AdjacencyList))
+    draw_graph(graph_in_file)
 
     rnd_graph = random_graph(7, 10)
-    draw_graph(convert(rnd_graph, AdjacencyList))
+    draw_graph(rnd_graph)
     rnd1_graph = random_graph(7, edge_probability=0.5)
-    draw_graph(convert(rnd1_graph, AdjacencyList))
+    draw_graph(rnd1_graph)
 
 
 if __name__ == "__main__":
