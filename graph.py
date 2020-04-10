@@ -304,7 +304,9 @@ def read_graph_from_file(filename, graph_type=AdjacencyMatrix):
             f.seek(0)
             matrix = [line.split() for line in f]
             matrix = [list(map(int, i)) for i in matrix]
-            matrix = [x - 1 for x in matrix]
+            for i in range(len(matrix)):
+                for j in range(len(matrix[i])):
+                    matrix[i][j] -= 1
             graph_in_file = AdjacencyList
     for i in range(len(matrix)):
         for j in matrix[i]:
