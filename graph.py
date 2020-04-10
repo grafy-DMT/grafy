@@ -30,7 +30,7 @@ class AdjacencyList:
             # vertex nr
             result += str(vertex + vertex_offset) + ": "
             # listed neighbours
-            result += ", ".join(str(neighbour)
+            result += ", ".join(str(neighbour + vertex_offset)
                                 for neighbour in self.neighbours_lists[vertex])
             result += "\n"
 
@@ -109,7 +109,7 @@ def adjacency_list_to_adjacency_matrix(adjacency_list):
     result_matrix = np.zeros((vertex_count, vertex_count), dtype=int)
     for vertex in range(vertex_count):
         for neighbour in adjacency_list.neighbours_lists[vertex]:
-            result_matrix[vertex][neighbour-1] = 1
+            result_matrix[vertex][neighbour] = 1
 
     return AdjacencyMatrix(result_matrix)
 
@@ -122,7 +122,7 @@ def adjacency_matrix_to_adjacency_list(adjacency_matrix):
         vertex_neighbours = []
         for neighbour_nr in range(vertex_count):
             if bool(matrix[vertex_index][neighbour_nr]):
-                vertex_neighbours.append(neighbour_nr+1)
+                vertex_neighbours.append(neighbour_nr)
         result_list.append(vertex_neighbours)
 
     return AdjacencyList(result_list)
@@ -305,6 +305,7 @@ def read_graph_from_file(filename, graph_type=AdjacencyMatrix):
             f.seek(0)
             matrix = [line.split() for line in f]
             matrix = [list(map(int, i)) for i in matrix]
+            matrix = [x - 1 for x in matrix]
             graph_in_file = "AdjacencyList"
     for i in range(len(matrix)):
         for j in matrix[i]:
@@ -337,7 +338,7 @@ def draw_graph(input_graph):
     graph = []
     for node, edges in enumerate(adjacency_list.neighbours_lists, 1):
         for edge in edges:
-            graph.append((node, edge))
+            graph.append((node, edge + 1))
 
     nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
 
