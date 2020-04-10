@@ -7,7 +7,6 @@ __all__ = ["AdjacencyList", "AdjacencyMatrix", "IncidenceMatrix", "convert", "ra
 # number of first vertex used in displaying and reading data
 vertex_offset = 1
 
-graph_in_file="AdjacencyMatrix"
 
 #########################
 # GRAPH REPRESENTATIONS
@@ -297,7 +296,7 @@ def random_graph(
 
 
 def read_graph_from_file(filename, graph_type=AdjacencyMatrix):
-    global graph_in_file
+    graph_in_file = AdjacencyMatrix
     with open(filename, 'r') as f:
         try:
             matrix = np.array([line.strip().split() for line in f], int)
@@ -306,31 +305,31 @@ def read_graph_from_file(filename, graph_type=AdjacencyMatrix):
             matrix = [line.split() for line in f]
             matrix = [list(map(int, i)) for i in matrix]
             matrix = [x - 1 for x in matrix]
-            graph_in_file = "AdjacencyList"
+            graph_in_file = AdjacencyList
     for i in range(len(matrix)):
         for j in matrix[i]:
             if j > 1:
-                graph_in_file = "AdjacencyList"
+                graph_in_file = AdjacencyList
                 break
-    if graph_in_file != "AdjacencyList":
+    if graph_in_file != AdjacencyList:
         if matrix.shape[0] == matrix.shape[1]:
             diagonal = matrix.shape[0]
             for i in range(matrix.shape[0]):
                 if matrix[i][i] == 0:
                     diagonal -= 1
             if diagonal == 0 and np.allclose(matrix, matrix.T):
-                graph_in_file = "AdjacencyMatrix"
+                graph_in_file = AdjacencyMatrix
             else:
-                graph_in_file = "IncidenceMatrix"
+                graph_in_file = IncidenceMatrix
         else:
-            graph_in_file = "IncidenceMatrix"
+            graph_in_file = IncidenceMatrix
 
-    if graph_in_file == "AdjacencyMatrix":
-        return convert(AdjacencyMatrix(matrix), graph_type)
-    elif graph_in_file == "IncidenceMatrix":
-        return convert(IncidenceMatrix(matrix), graph_type)
-    elif graph_in_file == "AdjacencyList":
-        return convert(AdjacencyList(matrix), graph_type)
+    if graph_in_file == AdjacencyMatrix:
+        return AdjacencyMatrix(matrix)
+    elif graph_in_file == IncidenceMatrix:
+        return IncidenceMatrix(matrix)
+    elif graph_in_file == AdjacencyList:
+        return AdjacencyList(matrix)
     
 def draw_graph(input_graph):
     adjacency_list = convert(input_graph, AdjacencyList)
@@ -362,20 +361,18 @@ def draw_graph(input_graph):
 
 def main():
     print("PROJEKCIK 1 GRAFY")
-    adjacency_matrix = read_graph_from_file('graph_examples.txt')
-    adjacency_list = convert(adjacency_matrix, AdjacencyList)
-    incidence_matrix = convert(adjacency_matrix, IncidenceMatrix)
+    graph_in_file = read_graph_from_file('graph_examples.txt')
 
-    if graph_in_file=="AdjacencyMatrix":
-        print(adjacency_list)
-        print(incidence_matrix)
-    elif graph_in_file=="IncidenceMatrix":
-        print(adjacency_matrix)
-        print(adjacency_list)
-    elif graph_in_file == "AdjacencyList":
-        print(adjacency_matrix)
-        print(incidence_matrix)
-    draw_graph(adjacency_list)
+    if type(graph_in_file) == AdjacencyMatrix:
+        print(convert(graph_in_file, AdjacencyList))
+        print(convert(graph_in_file, IncidenceMatrix))
+    elif type(graph_in_file) == IncidenceMatrix:
+        print(convert(graph_in_file, AdjacencyMatrix))
+        print(convert(graph_in_file, AdjacencyList))
+    elif type(graph_in_file) == AdjacencyList:
+        print(convert(graph_in_file, AdjacencyMatrix))
+        print(convert(graph_in_file, IncidenceMatrix))
+    draw_graph(convert(graph_in_file, AdjacencyList))
 
     rnd_graph = random_graph(7, 10)
     draw_graph(convert(rnd_graph, AdjacencyList))
