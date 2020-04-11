@@ -3,9 +3,18 @@ import random
 import networkx as nx
 import matplotlib.pyplot as plt
 
-__all__ = ["AdjacencyList", "AdjacencyMatrix", "IncidenceMatrix", "convert", "random_graph"]
+__all__ = [
+        "AdjacencyList",
+        "AdjacencyMatrix",
+        "IncidenceMatrix",
+        "convert",
+        "random_graph",
+        "read_graph_from_file",
+        "draw_graph"]
+
 # number of first vertex used in displaying and reading data
 vertex_offset = 1
+edge_offset = vertex_offset
 
 
 #########################
@@ -108,7 +117,7 @@ def adjacency_list_to_adjacency_matrix(adjacency_list):
     result_matrix = np.zeros((vertex_count, vertex_count), dtype=int)
     for vertex in range(vertex_count):
         for neighbour in adjacency_list.neighbours_lists[vertex]:
-            result_matrix[vertex][neighbour] = 1
+            result_matrix[vertex][neighbour - vertex_offset] = 1
 
     return AdjacencyMatrix(result_matrix)
 
@@ -145,7 +154,7 @@ class IncidenceMatrix:
 
         edges_description = []
         for edge_nr in range(self.edge_count):
-            edges_description.append("L" + str(edge_nr + vertex_offset))
+            edges_description.append("L" + str(edge_nr + edge_offset))
 
         result = "Macierz incydencji\n"
         result += matrix_to_string(self.matrix,
@@ -337,9 +346,9 @@ def draw_graph(input_graph):
     adjacency_list = convert(input_graph, AdjacencyList)
     # Extract pairs of nodes from adjacency_list
     graph = []
-    for node, edges in enumerate(adjacency_list.neighbours_lists, 1):
+    for node, edges in enumerate(adjacency_list.neighbours_lists, vertex_offset):
         for edge in edges:
-            graph.append((node, edge + 1))
+            graph.append((node, edge + vertex_offset))
 
     nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
 
@@ -360,27 +369,3 @@ def draw_graph(input_graph):
     # Show graph
     plt.show()
 
-
-def main():
-    print("PROJEKCIK 1 GRAFY")
-    graph_in_file = read_graph_from_file('graph_examples.txt')
-
-    if type(graph_in_file) == AdjacencyMatrix:
-        print(convert(graph_in_file, AdjacencyList))
-        print(convert(graph_in_file, IncidenceMatrix))
-    elif type(graph_in_file) == IncidenceMatrix:
-        print(convert(graph_in_file, AdjacencyMatrix))
-        print(convert(graph_in_file, AdjacencyList))
-    elif type(graph_in_file) == AdjacencyList:
-        print(convert(graph_in_file, AdjacencyMatrix))
-        print(convert(graph_in_file, IncidenceMatrix))
-    draw_graph(graph_in_file)
-
-    rnd_graph = random_graph(7, 10)
-    draw_graph(rnd_graph)
-    rnd1_graph = random_graph(7, edge_probability=0.5)
-    draw_graph(rnd1_graph)
-
-
-if __name__ == "__main__":
-    main()
