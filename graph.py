@@ -369,3 +369,28 @@ def draw_graph(input_graph):
     # Show graph
     plt.show()
 
+def graph_from_degree_seq(sequence):
+    sequence = sequence.copy()
+    result_list = [[] for _ in range(len(sequence))]
+    for vertex_index in range(len(sequence)):
+        vertex_neighbours = result_list[vertex_index]
+        neighbour_index = vertex_index + 1
+        while sequence[vertex_index] > 0:
+            if neighbour_index >= len(sequence):
+                raise ValueError("Input is not degree sequence")
+            if sequence[neighbour_index] > 0:
+                result_list[vertex_index].append(neighbour_index)
+                result_list[neighbour_index].append(vertex_index)
+                sequence[vertex_index] -= 1
+                sequence[neighbour_index] -= 1
+            neighbour_index += 1
+
+    return AdjacencyList(result_list)
+
+def is_graph_seq(sequence):
+    try:
+        graph_from_degree_seq(sequence)
+        return True
+    except ValueError:
+        return False
+
