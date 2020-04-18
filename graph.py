@@ -313,9 +313,6 @@ def read_graph_from_file(filename):
             f.seek(0)
             matrix = [line.split() for line in f]
             matrix = [list(map(int, i)) for i in matrix]
-            for i in range(len(matrix)):
-                for j in range(len(matrix[i])):
-                    matrix[i][j] -= 1
             graph_in_file = AdjacencyList
     for i in range(len(matrix)):
         for j in matrix[i]:
@@ -340,6 +337,9 @@ def read_graph_from_file(filename):
     elif graph_in_file == IncidenceMatrix:
         return IncidenceMatrix(matrix)
     elif graph_in_file == AdjacencyList:
+        for i in range(len(matrix)):
+            for j in range(len(matrix[i])):
+                matrix[i][j] -= 1
         return AdjacencyList(matrix)
     
 def draw_graph(input_graph):
