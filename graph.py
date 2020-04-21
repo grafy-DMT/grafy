@@ -4,13 +4,14 @@ import networkx as nx
 import matplotlib.pyplot as plt
 
 __all__ = [
-        "AdjacencyList",
-        "AdjacencyMatrix",
-        "IncidenceMatrix",
-        "convert",
-        "random_graph",
-        "read_graph_from_file",
-        "draw_graph"]
+    "AdjacencyList",
+    "AdjacencyMatrix",
+    "IncidenceMatrix",
+    "WeightedGraph",
+    "convert",
+    "random_graph",
+    "read_graph_from_file",
+    "draw_graph"]
 
 # number of first vertex used in displaying and reading data
 vertex_offset = 1
@@ -160,6 +161,42 @@ class IncidenceMatrix:
         result += matrix_to_string(self.matrix,
                                    rows_description, edges_description)
         return result
+
+
+# this class represents weighted graph
+# weights_matrix[i][j] = weight of the edge between vertices i and j
+# weights are random numbers in the range between 1 and 10
+class WeightedGraph:
+
+    def __init__(self, graph):
+        if type(graph) != AdjacencyList:
+            graph = convert(graph, AdjacencyList)
+        self.vertex_count = len(graph.neighbours_lists)
+        self.neighbours_lists = graph.neighbours_lists
+        self.weights_matrix = weighted_graph_matrix(graph)
+
+    def __str__(self):
+        global vertex_offset
+
+        columns_and_rows_description = list(map(str,
+                                                range(vertex_offset, self.vertex_count + vertex_offset)))
+
+        result = "Macierz wag\n"
+        result += matrix_to_string(self.weights_matrix,
+                                   columns_and_rows_description,
+                                   columns_and_rows_description)
+
+        return result
+
+
+def weighted_graph_matrix(graph):
+    matrix = np.zeros((graph.vertex_count, graph.vertex_count), dtype=int)
+
+    for vertex in range(graph.vertex_count):
+        for neighbour in graph.neighbours_lists[vertex]:
+            matrix[vertex][neighbour] = matrix[neighbour][vertex] = random.randint(1, 10)
+
+    return matrix
 
 
 ###############
@@ -341,12 +378,14 @@ def read_graph_from_file(filename):
             for j in range(len(matrix[i])):
                 matrix[i][j] -= 1
         return AdjacencyList(matrix)
-    
+
+
 def draw_graph(input_graph):
-    adjacency_list = convert(input_graph, AdjacencyList)
+    if type(input_graph) != AdjacencyList and type(input_graph) != WeightedGraph:
+        input_graph = convert(input_graph, AdjacencyList)
     # Extract pairs of nodes from adjacency_list
     graph = []
-    for node, edges in enumerate(adjacency_list.neighbours_lists, vertex_offset):
+    for node, edges in enumerate(input_graph.neighbours_lists, vertex_offset):
         for edge in edges:
             graph.append((node, edge + vertex_offset))
 
@@ -359,15 +398,26 @@ def draw_graph(input_graph):
         G.add_node(node)
 
     # Add edges to graph
-    for edge in graph:
-        G.add_edge(edge[0], edge[1])
+    if type(input_graph) != WeightedGraph:
+        for edge in graph:
+            G.add_edge(edge[0], edge[1])
+    else:
+        for edge in graph:
+            G.add_edge(edge[0], edge[1], weight=input_graph.weights_matrix[edge[0] - 1][edge[1] - 1])
 
     # Draw graph on circular layout
     pos = nx.circular_layout(G)
     nx.draw(G, pos)
     nx.draw_networkx_labels(G, pos=pos)
+
+    if type(input_graph) == WeightedGraph:
+        # Draw edges weight
+        labels = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+
     # Show graph
     plt.show()
+
 
 def graph_from_degree_seq(sequence):
     sequence = sequence.copy()
@@ -387,10 +437,10 @@ def graph_from_degree_seq(sequence):
 
     return AdjacencyList(result_list)
 
+
 def is_graph_seq(sequence):
     try:
         graph_from_degree_seq(sequence)
         return True
     except ValueError:
         return False
-
