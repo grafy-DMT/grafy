@@ -444,3 +444,49 @@ def is_graph_seq(sequence):
         return True
     except ValueError:
         return False
+
+def randomize_graph(graph, count=1):
+    graph = convert(graph, AdjacencyList)
+    neighbours_lists = graph.neighbours_lists
+    for _ in range(count):
+        randomized_successfully = False
+        while(randomized_successfully == False):
+
+            two_random_points = random.sample(
+                    range(graph.vertex_count), 2)
+
+            first_point = two_random_points[0]
+            second_point = two_random_points[1]
+
+            first_point_neighbours = set(neighbours_lists[first_point])
+            second_point_neighbours = set(neighbours_lists[second_point])
+
+            # point which we may swap
+            first_point_available = first_point_neighbours.copy()
+            second_point_available = second_point_neighbours.copy()
+            first_point_available.discard(second_point_neighbours)
+            first_point_available.discard(second_point)
+            second_point_available.discard(first_point_neighbours)
+            second_point_available.discard(first_point)
+
+            # no points to switch
+            if (not first_point_available or not second_point_available):
+                continue
+            first_to_switch = random.choice(list(first_point_available))
+            second_to_switch = random.choice(list(second_point_available))
+
+            #removing connection
+            neighbours_lists[first_point].remove(first_to_switch)
+            neighbours_lists[second_point].remove(second_to_switch)
+            neighbours_lists[first_to_switch].remove(first_point)
+            neighbours_lists[second_to_switch].remove(second_point)
+
+            #adding new connections
+            neighbours_lists[first_point].append(second_to_switch)
+            neighbours_lists[second_point].append(first_to_switch)
+            neighbours_lists[first_to_switch].append(second_point)
+            neighbours_lists[second_to_switch].append(first_point)
+
+            randomized_successfully = True
+    return graph
+
