@@ -36,9 +36,18 @@ sequence2 = [4, 4, 3, 1, 2]
 print("Sequence1: " + str(gp.is_graph_seq(sequence1)))
 print("Sequence2: " + str(gp.is_graph_seq(sequence2)))
 
-gp.draw_graph(gp.graph_from_degree_seq(sequence1))
+graph_from_sequence1 = gp.graph_from_degree_seq(sequence1)
+gp.draw_graph(graph_from_sequence1)
 
-# HAMILTON CYCLE
+# Ad3 Components
+gp.print_components_and_max_component(graph_from_sequence1)
+
+# Ad4 Eulerian Path
+eulerian_graph = gp.read_graph_from_file('projekt2/eulerian_graph.txt')
+gp.draw_graph(eulerian_graph)
+gp.print_eulerian_path(eulerian_graph)
+
+# Ad6 Hamilton Cycle
 graph_in_file = gp.read_graph_from_file('projekt2/ham_ex2.txt')
 graph = gp.convert(graph_in_file, gp.AdjacencyList)
 

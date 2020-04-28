@@ -1,3 +1,5 @@
+from collections import defaultdict
+
 import numpy as np
 import random
 import networkx as nx
@@ -380,6 +382,15 @@ def read_graph_from_file(filename):
         return AdjacencyList(matrix)
 
 
+def get_edges_and_nodes_from_adjacency_list(input_graph):
+    graph = []
+    for node, edges in enumerate(input_graph.neighbours_lists, vertex_offset):
+        for edge in edges:
+            graph.append((node, edge + vertex_offset))
+    nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
+    return graph, nodes
+
+
 def draw_graph(input_graph):
     if type(input_graph) != AdjacencyList and type(input_graph) != WeightedGraph:
         input_graph = convert(input_graph, AdjacencyList)
@@ -388,7 +399,6 @@ def draw_graph(input_graph):
     for node, edges in enumerate(input_graph.neighbours_lists, vertex_offset):
         for edge in edges:
             graph.append((node, edge + vertex_offset))
-
     nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
 
     # Create NetworkX graph
@@ -445,15 +455,16 @@ def is_graph_seq(sequence):
     except ValueError:
         return False
 
+
 def randomize_graph(graph, count=1):
     graph = convert(graph, AdjacencyList)
     neighbours_lists = graph.neighbours_lists
     for _ in range(count):
         randomized_successfully = False
-        while(randomized_successfully == False):
+        while not randomized_successfully:
 
             two_random_points = random.sample(
-                    range(graph.vertex_count), 2)
+                range(graph.vertex_count), 2)
 
             first_point = two_random_points[0]
             second_point = two_random_points[1]
@@ -470,18 +481,18 @@ def randomize_graph(graph, count=1):
             second_point_available.discard(first_point)
 
             # no points to switch
-            if (not first_point_available or not second_point_available):
+            if not first_point_available or not second_point_available:
                 continue
             first_to_switch = random.choice(list(first_point_available))
             second_to_switch = random.choice(list(second_point_available))
 
-            #removing connection
+            # removing connection
             neighbours_lists[first_point].remove(first_to_switch)
             neighbours_lists[second_point].remove(second_to_switch)
             neighbours_lists[first_to_switch].remove(first_point)
             neighbours_lists[second_to_switch].remove(second_point)
 
-            #adding new connections
+            # adding new connections
             neighbours_lists[first_point].append(second_to_switch)
             neighbours_lists[second_point].append(first_to_switch)
             neighbours_lists[first_to_switch].append(second_point)
@@ -489,4 +500,97 @@ def randomize_graph(graph, count=1):
 
             randomized_successfully = True
     return graph
+
+
+def components(input_graph):
+    # Check that input_graph is adjency list
+    component_number = 0
+    neighbours = input_graph.neighbours_lists[:]
+
+    # Create another func for max?
+    neighbours_size = [len(x) for x in neighbours]
+    max_comp = max(neighbours_size)
+    max_components = [i for i, j in enumerate(neighbours_size, vertex_offset) if j == max_comp]
+
+    comp = [-1 for _ in range(len(neighbours))]
+    for v in range(len(comp)):
+        if comp[v] == -1:
+            component_number += 1
+            comp[v] = component_number
+            components_r(component_number, v, neighbours, comp)
+
+    return comp, max_components
+
+
+def components_r(component_number, v, neighbours, comp):
+    for neighbour in neighbours[v]:
+        if comp[neighbour] == -1:
+            comp[neighbour] = component_number
+            components_r(component_number, neighbour, neighbours, comp)
+
+
+def print_components_and_max_component(input_graph):
+    print("---------------------------------------------")
+    print("Spojne skladowe i najwkieksza spojna skladowa")
+    print("---------------------------------------------")
+    comp, max_components = components(input_graph)
+    result = defaultdict(list)
+    for i, component in enumerate(comp, vertex_offset):
+        result[component].append(i)
+    for k, v in result.items():
+        print(f"{k}) {str(v)[1:-1]}")
+    print(str(max_components)[1:-1])
+
+
+def is_eulerian_graph(input_graph):
+    comp, _ = components(input_graph)
+    edges, nodes = get_edges_and_nodes_from_adjacency_list(input_graph)
+    # Check if there is more than one connected components
+    if len(set(comp)) > 1:
+        return
+    # Check that every node degree is even
+    odd_arr = [1 for degree in input_graph.neighbours_lists if len(degree) & 1 != 0]
+    if len(odd_arr) > 2:
+        return
+
+    eulerian_stack = []
+    neighbours = input_graph.neighbours_lists[:]
+    neighbour1 = 0
+    eulerian_stack.append(neighbour1)
+
+    while not check_if_empty(neighbours):
+        try:
+            neighbour2 = neighbours[neighbour1].pop(0)
+            eulerian_stack.append(neighbour2)
+            if neighbour1 in neighbours[neighbour2]:
+                neighbours[neighbour2].remove(neighbour1)
+            neighbour1 = neighbours[neighbour2].pop(0)
+            eulerian_stack.append(neighbour1)
+            if neighbour2 in neighbours[neighbour1]:
+                neighbours[neighbour1].remove(neighbour2)
+        except IndexError:
+            return
+
+    return eulerian_stack
+
+
+def check_if_empty(list_of_lists):
+    for elem in list_of_lists:
+        if elem:
+            return False
+    return True
+
+
+def print_eulerian_path(input_graph):
+    path = is_eulerian_graph(input_graph)
+    print("------------------------")
+    print("Wierzcholki cyklu eulera")
+    print("------------------------")
+    if path:
+        print("[", end="")
+        for i in range(len(path) - 1):
+            print(path[i] + 1, end=" - ")
+        print(f"{path[-1] + 1}]")
+    else:
+        print("Graf nie jest eulerowski")
 
