@@ -119,6 +119,37 @@ def print_distance_matrix(dist_matrix):
     result = matrix_to_string(dist_matrix,row_description,col_description)
     print(result)
 
+def center_index(weighted_graph):
+    dist_matrix = distance_matrix(weighted_graph)
+
+    min_sum = -1
+    min_index = -1
+    for index, distance_list in enumerate(dist_matrix):
+        if (index == 0):
+            min_sum = sum(distance_list)
+            min_index = index
+        elif (min_sum > sum(distance_list)):
+            min_sum = sum(distance_list)
+            min_index = index
+
+    return min_index
+
+def minmax_center_index(weighted_graph):
+    dist_matrix = distance_matrix(weighted_graph)
+
+    min_max = -1
+    min_index = -1
+    for index, distance_list in enumerate(dist_matrix):
+        if (index == 0):
+            min_max = max(distance_list)
+            min_index = index
+        elif (min_max > max(distance_list)):
+            min_max = max(distance_list)
+            min_index = index
+
+    return min_index
+
+
 def main():
     print("PROJEKCIK 3 GRAFY")
 
@@ -133,6 +164,14 @@ def main():
     print("--------AD3--------")
     dist_matrix = distance_matrix(graph)
     print_distance_matrix(dist_matrix)
+
+    print("--------AD4--------")
+    center_vertex = center_index(graph) + 1
+    minmax_center_vertex = minmax_center_index(graph) + 1
+    print("graph center vertex: " + str(center_vertex))
+    print("graph minmax center vertex: " + str(minmax_center_vertex))
+    draw_graph(graph)
+
 
 
 if __name__ == "__main__":
