@@ -10,6 +10,7 @@ __all__ = [
     "AdjacencyMatrix",
     "IncidenceMatrix",
     "WeightedGraph",
+    "DirectedGraph",
     "convert",
     "random_graph",
     "read_graph_from_file",
@@ -201,6 +202,27 @@ def weighted_graph_matrix(graph):
     return matrix
 
 
+# this class represents directed graph
+# it is saved in adjacency list representation
+class DirectedGraph:
+
+    def __init__(self, adjacency_list):
+        self.vertex_count = len(adjacency_list.neighbours_lists)
+        self.neighbours_lists = adjacency_list.neighbours_lists
+
+    def __str__(self):
+        result = "Lista sąsiedztwa digrafu\n"
+        for vertex in range(self.vertex_count):
+            # vertex nr
+            result += str(vertex + vertex_offset) + ": "
+            # listed neighbours
+            result += ", ".join(str(neighbour + vertex_offset)
+                                for neighbour in self.neighbours_lists[vertex])
+            result += "\n"
+
+        return result
+
+
 ###############
 # CONVERSIONS
 ###############
@@ -343,6 +365,23 @@ def random_graph(
             graph_type)
 
 
+def random_directed_graph(vertex_count, edge_probability):
+    all_pairs = []
+    for idx1 in range(vertex_count):
+        for idx2 in range(idx1):
+            all_pairs.append((idx1, idx2))
+            all_pairs.append((idx2, idx1))
+
+    matrix = np.zeros((vertex_count, vertex_count), dtype=int)
+    for pair in all_pairs:
+        if random.random() < edge_probability:
+            matrix[pair[0]][pair[1]] = 1
+
+    result = AdjacencyMatrix(matrix)
+    result = convert(result, AdjacencyList)
+    return DirectedGraph(result)
+
+
 def read_graph_from_file(filename):
     graph_in_file = AdjacencyMatrix
     with open(filename, 'r') as f:
@@ -392,7 +431,7 @@ def get_edges_and_nodes_from_adjacency_list(input_graph):
 
 
 def draw_graph(input_graph):
-    if type(input_graph) != AdjacencyList and type(input_graph) != WeightedGraph:
+    if type(input_graph) != AdjacencyList and type(input_graph) != WeightedGraph and type(input_graph) != DirectedGraph:
         input_graph = convert(input_graph, AdjacencyList)
     # Extract pairs of nodes from adjacency_list
     graph = []
@@ -402,7 +441,10 @@ def draw_graph(input_graph):
     nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
 
     # Create NetworkX graph
-    G = nx.Graph()
+    if type(input_graph) != DirectedGraph:
+        G = nx.Graph()
+    else:
+        G = nx.DiGraph()
     # Add nodes to graph
     for node in nodes:
         G.add_node(node)
