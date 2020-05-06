@@ -1,6 +1,7 @@
 import numpy as np
 from graph import *
 from graph import matrix_to_string, draw_graph
+from collections import OrderedDict
 
 d = 0
 p = 0
@@ -77,12 +78,12 @@ def dijkstra(graph, v=1):
             if neighbour not in S:
                 relax(u, neighbour, graph)
 
-    print("START: s = " + str(v))
     ptr = 0
+    weights = []
+    nodes_and_neighbours = OrderedDict()
     for i in range(n):
-        row = ""
-        row += "d(" + str(i + 1) + ") = " + str(d[i]) + " ==> "
-        row += "["
+        weights.append(d[i])
+        nodes_and_neighbours[i + 1] = []
         j = i
         while j > -1:
             S[ptr] = j
@@ -90,20 +91,48 @@ def dijkstra(graph, v=1):
             j = p[j]
         while ptr > 0:
             ptr -= 1
-            row += str(S[ptr] + 1)
-            if ptr != 0:
-                row += " - "
-        row += "]"
-        print(row)
+            nodes_and_neighbours[i + 1].append(S[ptr] + 1)
+    return weights, nodes_and_neighbours
 
+
+def print_dijkstry(weights, nodes_and_neighbours, v=1):
+    print("-----DIJKSTRY-----")
+    print(f"START: s = {v}")
+    for node, neighbours in nodes_and_neighbours.items():
+        print(f"d({node}) = {weights[node - 1]} ==> [", end="")
+        print(*neighbours, sep=" - ", end="]\n")
+
+
+def distance_matrix(graph):
+    n = graph.vertex_count
+    dist_matrix = []
+    for i in range(1, n + 1):
+        weights,_ = dijkstra(graph, i)
+        dist_matrix.append(weights)
+    return dist_matrix
+
+
+def print_distance_matrix(dist_matrix):
+    print("Macierz Odleglosci")
+    row_description = [str(i) for i in range(1, len(dist_matrix) + 1)]
+    col_description = [str(i) for i in range(1, len(dist_matrix) + 1)]
+    result = matrix_to_string(dist_matrix,row_description,col_description)
+    print(result)
 
 def main():
     print("PROJEKCIK 3 GRAFY")
 
     graph = random_connected_graph()
     graph = WeightedGraph(graph)
-    dijkstra(graph)
+
+    weights, nodes_and_neighbours = dijkstra(graph)
+    print("--------AD2--------")
+    print_dijkstry(weights, nodes_and_neighbours)
     draw_graph(graph)
+
+    print("--------AD3--------")
+    dist_matrix = distance_matrix(graph)
+    print_distance_matrix(dist_matrix)
 
 
 if __name__ == "__main__":
