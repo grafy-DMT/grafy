@@ -219,6 +219,7 @@ def minimum_spanning_tree_PRIM(graph):
 def main():
     print("PROJEKCIK 3 GRAFY")
 
+    print("--------AD1--------")
     graph = random_connected_graph()
     graph = WeightedGraph(graph)
 
