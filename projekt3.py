@@ -153,6 +153,7 @@ def minmax_center_index(weighted_graph):
 def main():
     print("PROJEKCIK 3 GRAFY")
 
+    print("--------AD1--------")
     graph = random_connected_graph()
     graph = WeightedGraph(graph)
 
