@@ -34,7 +34,7 @@ def random_connected_graph():
     connected = False
 
     while not connected:
-        graph = random_graph(7, 10)
+        graph = random_graph(7,10)
         graph = convert(graph, AdjacencyList)
         if is_connected(graph):
             connected = True
@@ -149,6 +149,72 @@ def minmax_center_index(weighted_graph):
 
     return min_index
 
+def minimum_spanning_tree_PRIM(graph):
+    print(graph.weights_matrix)
+    print('\n')
+    vertex=0
+    result_matrix = np.zeros((graph.vertex_count, graph.vertex_count), dtype=int)
+    option_list = np.array([], int)
+    option_list = graph.weights_matrix[0]
+    vertex_order = np.array([], int)
+    vertex_order = np.append(vertex_order,0)
+    print("verex_count: "+str(graph.vertex_count))
+    j=0
+    temp = np.array([], int)
+    for x in range(graph.vertex_count):
+        temp = np.append(temp,x)
+    
+    #option_list = np.append(option_list,graph.weights_matrix[4])
+    while len(vertex_order) != (graph.vertex_count):
+        #print(len(vertex_order) != (graph.vertex_count-1))
+        #print("len(verex_order): "+str(len(vertex_order)))
+        
+        weight = min(i for i in option_list if i>0)
+        #print("waga: "+str(weight))
+        index = np.where(weight==option_list)[0][0]
+        while j < graph.vertex_count:
+            #print ("vertex: "+str(vertex))
+            print("index: "+str(index))
+        
+            if not(((index in vertex_order)and(vertex in vertex_order)) and j>0):
+                print ("vertex not in vertex_order or...")
+                print ("index not in vertex_order or...")
+                print ("j==0")
+
+                option_list[index] = 0
+                
+                print ("j:"+str(j))
+                print(option_list)
+                print("verex_order: "+str(vertex_order))
+                vertex = vertex_order[j]
+                
+                index=index % (graph.vertex_count)
+                result_matrix[vertex][index]=weight
+                result_matrix[index][vertex]=weight
+                graph.weights_matrix[vertex][index]=0
+                graph.weights_matrix[index][vertex]=0
+                option_list = np.append(option_list,graph.weights_matrix[index])
+                #vertex = index
+                vertex_order = np.append(vertex_order,index)
+                
+                print(result_matrix)
+                j=j+1 
+                #if len(vertex_order) == (graph.vertex_count)+1:
+                #    break
+            else:
+                option_list[index] = 0
+                print(option_list)
+                weight = np.min(option_list[np.nonzero(option_list)])
+                print('weight' + str(weight))           
+                index = np.where(weight==option_list)[0][0]
+                print('ten sam')
+                if len(vertex_order) == (graph.vertex_count):
+                    print(vertex_order)
+                    break
+
+    graph.weights_matrix = result_matrix
+    return graph
+    
 
 def main():
     print("PROJEKCIK 3 GRAFY")
@@ -172,6 +238,11 @@ def main():
     print("graph center vertex: " + str(center_vertex))
     print("graph minmax center vertex: " + str(minmax_center_vertex))
     draw_graph(graph)
+
+    print("--------AD5--------")
+    graph = minimum_spanning_tree_PRIM(graph)
+    draw_graph(graph)
+
 
 
 
