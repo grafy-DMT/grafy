@@ -11,6 +11,8 @@ __all__ = [
     "IncidenceMatrix",
     "WeightedGraph",
     "DirectedGraph",
+    "DirectedWeightedGraphxD",
+    "random_directed_weighted_graph",
     "convert",
     "random_graph",
     "read_graph_from_file",
@@ -171,12 +173,16 @@ class IncidenceMatrix:
 # weights are random numbers in the range between 1 and 10
 class WeightedGraph:
 
-    def __init__(self, graph):
+    def __init__(self, graph, weights_matrix=None):
         if type(graph) != AdjacencyList:
             graph = convert(graph, AdjacencyList)
         self.vertex_count = len(graph.neighbours_lists)
         self.neighbours_lists = graph.neighbours_lists
-        self.weights_matrix = weighted_graph_matrix(graph)
+        if weights_matrix is None:
+            self.weights_matrix = weighted_graph_matrix(graph)
+        else:
+            self.weights_matrix = weights_matrix
+
 
     def __str__(self):
         global vertex_offset
@@ -192,12 +198,12 @@ class WeightedGraph:
         return result
 
 
-def weighted_graph_matrix(graph):
+def weighted_graph_matrix(graph, weights_range=(1, 10)):
     matrix = np.zeros((graph.vertex_count, graph.vertex_count), dtype=int)
 
     for vertex in range(graph.vertex_count):
         for neighbour in graph.neighbours_lists[vertex]:
-            matrix[vertex][neighbour] = matrix[neighbour][vertex] = random.randint(1, 10)
+            matrix[vertex][neighbour] = random.randint(weights_range[0], weights_range[1])
 
     return matrix
 
@@ -221,6 +227,32 @@ class DirectedGraph:
             result += "\n"
 
         return result
+
+class DirectedWeightedGraphxD:
+
+    def __init__(self, directed_graph, weights_matrix):
+        if type(directed_graph) != DirectedGraph:
+            raise ValueError("Wrong input graph, should be DirectedGraph")
+        self.vertex_count = directed_graph.vertex_count
+        self.directed_graph = directed_graph
+        self.neighbours_lists = directed_graph.neighbours_lists
+        self.weights_matrix = weights_matrix
+
+    def __str__(self):
+        result = str(self.directed_graph)
+        result += "\nMacierz wag\n"
+        result += matrix_to_string(self.weights_matrix,
+                                   columns_and_rows_description,
+                                   columns_and_rows_description)
+        return result
+
+def random_directed_weighted_graph(vertex_count, edge_probability, weights_range=(1, 10)):
+    graph = None
+    graph = random_directed_graph(vertex_count, edge_probability)
+    weights_matrix = weighted_graph_matrix(graph, weights_range)
+    graph = DirectedWeightedGraphxD(graph, weights_matrix)
+    return graph
+
 
 
 ###############
@@ -431,7 +463,7 @@ def get_edges_and_nodes_from_adjacency_list(input_graph):
 
 
 def draw_graph(input_graph):
-    if type(input_graph) != AdjacencyList and type(input_graph) != WeightedGraph and type(input_graph) != DirectedGraph:
+    if type(input_graph) != AdjacencyList and type(input_graph) != WeightedGraph and type(input_graph) != DirectedGraph and type(input_graph) != DirectedWeightedGraphxD:
         input_graph = convert(input_graph, AdjacencyList)
     # Extract pairs of nodes from adjacency_list
     graph = []
@@ -441,7 +473,7 @@ def draw_graph(input_graph):
     nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
 
     # Create NetworkX graph
-    if type(input_graph) != DirectedGraph:
+    if type(input_graph) != DirectedGraph and type(input_graph) != DirectedWeightedGraphxD:
         G = nx.Graph()
     else:
         G = nx.DiGraph()
@@ -450,7 +482,7 @@ def draw_graph(input_graph):
         G.add_node(node)
 
     # Add edges to graph
-    if type(input_graph) != WeightedGraph:
+    if type(input_graph) != WeightedGraph and type(input_graph) != DirectedWeightedGraphxD:
         for edge in graph:
             G.add_edge(edge[0], edge[1])
     else:
@@ -462,7 +494,7 @@ def draw_graph(input_graph):
     nx.draw(G, pos)
     nx.draw_networkx_labels(G, pos=pos)
 
-    if type(input_graph) == WeightedGraph:
+    if type(input_graph) == WeightedGraph or type(input_graph) == DirectedWeightedGraphxD:
         # Draw edges weight
         labels = nx.get_edge_attributes(G, 'weight')
         nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
