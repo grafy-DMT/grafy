@@ -210,7 +210,7 @@ def johnson(directed_weighted_graph):
     g_prim = add_s(directed_weighted_graph)
     h = np.zeros((vertex_count + 1), dtype=int)
     if not bellman_fort(g_prim, vertex_count):
-        raise ValueError("Found negative cycle")
+        return "Found negative cycle"
     w_daszek = g_prim.weights_matrix.copy()
     for v in range(vertex_count + 1):
         h[v] = d[v]
@@ -250,7 +250,7 @@ def main():
 
     print("AD3")
 
-    graph = random_directed_connected_weighted_graph(7, 0.3, (5, 10))
+    graph = random_directed_connected_weighted_graph(7, 0.3, (-5, 10))
     print_shortest_paths(graph)
     draw_graph(graph)
 
