@@ -239,7 +239,10 @@ class DirectedWeightedGraphxD:
         self.weights_matrix = weights_matrix
 
     def __str__(self):
+        global vertex_offset
         result = str(self.directed_graph)
+        columns_and_rows_description = list(map(str,
+                                                range(vertex_offset, self.vertex_count + vertex_offset)))
         result += "\nMacierz wag\n"
         result += matrix_to_string(self.weights_matrix,
                                    columns_and_rows_description,
@@ -497,7 +500,17 @@ def draw_graph(input_graph):
     if type(input_graph) == WeightedGraph or type(input_graph) == DirectedWeightedGraphxD:
         # Draw edges weight
         labels = nx.get_edge_attributes(G, 'weight')
-        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+        if type(input_graph) == DirectedWeightedGraphxD:
+            result_list = {}
+            for posi, wg in labels.items():
+                if (posi[1], posi[0]) in result_list:
+                    result_list[posi] = result_list[(posi[1], posi[0])] + ", " + str(posi[0]) + "->" + str(posi[1]) + ": " + str(wg)
+                else:
+                    result_list[posi] = str(posi[0]) + "->" + str(posi[1]) + ": " + str(wg)
+
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=result_list)
+        else:
+            nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
 
     # Show graph
     plt.show()
