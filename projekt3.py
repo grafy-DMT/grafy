@@ -3,6 +3,10 @@ from graph import *
 from graph import matrix_to_string, draw_graph
 from collections import OrderedDict
 
+from graph import vertex_offset
+import networkx as nx
+import matplotlib.pyplot as plt
+
 d = 0
 p = 0
 BIGINT = 922337203
@@ -216,6 +220,79 @@ def minimum_spanning_tree_PRIM(graph):
     return graph
     
 
+def draw_weighted_graph(input_graph):
+    if type(input_graph) != AdjacencyList and type(input_graph) != WeightedGraph and type(input_graph) != DirectedGraph:
+        input_graph = convert(input_graph, AdjacencyList)
+    # Extract pairs of nodes from adjacency_list
+    graph = []
+    for node, edges in enumerate(input_graph.neighbours_lists, vertex_offset):
+        for edge in edges:
+            graph.append((node, edge + vertex_offset))
+    nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
+
+    # Create NetworkX graph
+    if type(input_graph) != DirectedGraph:
+        G = nx.Graph()
+    else:
+        G = nx.DiGraph()
+    # Add nodes to graph
+    for node in nodes:
+        G.add_node(node)
+    # Add edges to graph
+    if type(input_graph) != WeightedGraph:
+        for edge in graph:
+            G.add_edge(edge[0], edge[1])
+    else:
+        for edge in graph:
+            if (input_graph.weights_matrix[edge[0] - 1][edge[1] - 1] >0 ):
+                G.add_edge(edge[0], edge[1], weight=input_graph.weights_matrix[edge[0] - 1][edge[1] - 1])
+
+    # Draw graph on circular layout
+    pos = nx.circular_layout(G)
+    nx.draw(G, pos)
+    nx.draw_networkx_labels(G, pos=pos)
+
+    if type(input_graph) == WeightedGraph:
+        # Draw edges weight
+        labels = nx.get_edge_attributes(G, 'weight')
+        nx.draw_networkx_edge_labels(G, pos, edge_labels=labels)
+
+    # Show graph
+    plt.show()
+
+#------------------Do Projekt3.py------------------ 
+def minimum_spanning_tree_PRIM_V2(graph):
+    print ('Macierz wag wejściowa')
+    print(graph.weights_matrix)
+    print('\n')
+    vertex=0
+    result_matrix = np.zeros((graph.vertex_count, graph.vertex_count), dtype=int)
+    option_list = np.array([], int)
+    option_list = graph.weights_matrix[0]
+    vertex_order = np.array([], int)
+    vertex_order = np.append(vertex_order,0)
+
+    while len(vertex_order) != (graph.vertex_count):
+       
+        weight = min(i for i in option_list if i>0)
+        
+        index = np.where(weight==option_list)[0][0]
+
+        if((index % graph.vertex_count) in vertex_order):
+            option_list[index]=0
+        
+        else:  
+            vertex = vertex_order[int(index/graph.vertex_count)]  
+            vertex_order = np.append(vertex_order,(index % graph.vertex_count))
+            result_matrix[vertex][(index % graph.vertex_count)]= weight
+            result_matrix[(index % graph.vertex_count)][vertex]= weight
+            option_list = np.append(option_list,graph.weights_matrix[index % graph.vertex_count])
+    print ('Macierz wag wyjściowa')
+    print(result_matrix)
+    graph.weights_matrix = result_matrix
+    return graph            
+ 
+
 def main():
     print("PROJEKCIK 3 GRAFY")
 
@@ -240,8 +317,8 @@ def main():
     draw_graph(graph)
 
     print("--------AD5--------")
-    graph = minimum_spanning_tree_PRIM(graph)
-    draw_graph(graph)
+    graph = minimum_spanning_tree_PRIM_V2(graph)
+    draw_weighted_graph(graph)
 
 
 
