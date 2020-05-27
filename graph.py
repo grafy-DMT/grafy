@@ -1,9 +1,12 @@
+import copy
 from collections import defaultdict
 
 import numpy as np
 import random
 import networkx as nx
 import matplotlib.pyplot as plt
+from networkx.drawing.nx_agraph import graphviz_layout
+import itertools
 
 __all__ = [
     "AdjacencyList",
@@ -183,7 +186,6 @@ class WeightedGraph:
         else:
             self.weights_matrix = weights_matrix
 
-
     def __str__(self):
         global vertex_offset
 
@@ -208,6 +210,16 @@ def weighted_graph_matrix(graph, weights_range=(1, 10)):
     return matrix
 
 
+def flow_graph_matrix(graph, capacity_matrix):
+    matrix = np.zeros((graph.vertex_count, graph.vertex_count), dtype=int)
+
+    # for vertex in range(graph.vertex_count):
+    #     for neighbour in graph.neighbours_lists[vertex]:
+    #         matrix[vertex][neighbour] = random.randint(0, capacity_matrix[vertex][neighbour])
+
+    return matrix
+
+
 # this class represents directed graph
 # it is saved in adjacency list representation
 class DirectedGraph:
@@ -227,6 +239,7 @@ class DirectedGraph:
             result += "\n"
 
         return result
+
 
 class DirectedWeightedGraphxD:
 
@@ -249,13 +262,35 @@ class DirectedWeightedGraphxD:
                                    columns_and_rows_description)
         return result
 
+
+class FlowNetwork:
+    def __init__(self, directed_graph, flow_matrix, capacity_matrix):
+        if type(directed_graph) != DirectedGraph:
+            raise ValueError("Wrong input graph, should be DirectedGraph")
+        self.vertex_count = directed_graph.vertex_count
+        self.directed_graph = directed_graph
+        self.neighbours_lists = directed_graph.neighbours_lists
+        self.flow_matrix = flow_matrix
+        self.capacity_matrix = capacity_matrix
+
+    def __str__(self):
+        global vertex_offset
+        result = str(self.directed_graph)
+        columns_and_rows_description = list(map(str,
+                                                range(vertex_offset, self.vertex_count + vertex_offset)))
+        result += "\nMacierz przepływu i przepustowosci\n"
+        result += matrix_to_string(str(self.flow_matrix + "/" + self.capacity_matrix),
+                                   columns_and_rows_description,
+                                   columns_and_rows_description)
+        return result
+
+
 def random_directed_weighted_graph(vertex_count, edge_probability, weights_range=(1, 10)):
     graph = None
     graph = random_directed_graph(vertex_count, edge_probability)
     weights_matrix = weighted_graph_matrix(graph, weights_range)
     graph = DirectedWeightedGraphxD(graph, weights_matrix)
     return graph
-
 
 
 ###############
@@ -417,6 +452,68 @@ def random_directed_graph(vertex_count, edge_probability):
     return DirectedGraph(result)
 
 
+def random_flow_network(n):
+    if n < 2:
+        print("Liczba warstw powinna byc wieksza od dwoch")
+        return 0
+    vertex_count = 2
+    layers = []
+    all_pairs = set()
+    # draw number of vertex in layers
+    for i in range(n):
+        layers.append(n)
+    # layers.append(random.randint(2, n))
+
+    vertex_count += sum(layers)
+    matrix_len = vertex_count - 1
+
+    matrix = np.zeros((vertex_count, vertex_count), dtype=int)
+    actual_position = layers[0] + 1
+    # add edges from s of flow network
+    for i in range(1, layers[0] + 1):
+        matrix[0][i] = 1
+        all_pairs.add((0, i))
+    # add edges to layers
+    position_at_layer = 1
+    for i in range(n - 1):
+        nodes_to_chose = [x for x in range(actual_position, actual_position + layers[i + 1])]
+        random.shuffle(nodes_to_chose)
+        actual_position += layers[i + 1]
+        for idx in range(position_at_layer, position_at_layer + layers[i]):
+            idx2 = nodes_to_chose.pop()
+            matrix[idx][idx2] = 1
+            all_pairs.add((idx, idx2))
+
+        # Add 2N edges to flow network
+        perm = set(())
+        vertex_in_neighbour_layers = [x for x in
+                                      range(position_at_layer + layers[i],
+                                            position_at_layer + layers[i] + layers[i + 1])]
+        for node in range(position_at_layer, position_at_layer + layers[i] - 1):
+            possible_vertex = [node, node + 1] + vertex_in_neighbour_layers
+            perm |= (set(itertools.combinations(possible_vertex, 2)))
+            possible_vertex.clear()
+        possible_edges = (perm - all_pairs)
+        for _ in range(int(2 * n / (n - 1))):
+            idx1 = random.randint(0, 1)
+            edges_index = possible_edges.pop()
+            matrix[edges_index[idx1]][edges_index[1 - idx1]] = 1
+        position_at_layer += layers[i]
+
+    # add edges to position t of flow network
+    for i in range(actual_position - layers[-1], actual_position):
+        matrix[i][matrix_len] = 1
+        all_pairs.add((i, matrix_len))
+
+    result = AdjacencyMatrix(matrix)
+    result = convert(result, AdjacencyList)
+    capacity_matrix = weighted_graph_matrix(result)
+    flow_matrix = flow_graph_matrix(result,capacity_matrix)
+    digraph = DirectedGraph(result)
+    flow_network = FlowNetwork(digraph,flow_matrix,capacity_matrix)
+    return flow_network, layers
+
+
 def read_graph_from_file(filename):
     graph_in_file = AdjacencyMatrix
     with open(filename, 'r') as f:
@@ -463,6 +560,7 @@ def get_edges_and_nodes_from_adjacency_list(input_graph):
             graph.append((node, edge + vertex_offset))
     nodes = set([n1 for n1, n2 in graph] + [n2 for n1, n2 in graph])
     return graph, nodes
+
 
 
 def draw_graph(input_graph):
